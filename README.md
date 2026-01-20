@@ -1,10 +1,10 @@
-# none.api MCP Server
+# Servidor MCP none.api
 
-Professional OpenAPI Explorer Model Context Protocol (MCP) server.
+Explorador profesional de OpenAPI para el protocolo Model Context Protocol (MCP).
 
-## ¿Qué es esto? / What is this?
+## ¿Qué es esto?
 
-Este servidor MCP permite a los modelos de lenguaje (como Claude) **explorar, entender e interactuar con cualquier API que tenga una especificación OpenAPI/Swagger**. 
+Este servidor MCP permite a los modelos de lenguaje (como Claude o Cursor) **explorar, entender e interactuar con cualquier API que tenga una especificación OpenAPI/Swagger**. 
 
 En lugar de copiar y pegar manualmente la documentación de una API, este servidor permite que el modelo consulte dinámicamente:
 - Qué endpoints están disponibles.
@@ -14,39 +14,29 @@ En lugar de copiar y pegar manualmente la documentación de una API, este servid
 
 Es ideal para desarrolladores que necesitan integrar APIs de terceros o explorar sus propias APIs locales de forma asistida por IA.
 
----
+Este servidor está diseñado y optimizado principalmente para trabajar con backends que siguen la estructura de [hono-template](https://github.com/Nonetss/hono-template).
 
-This MCP server allows language models (like Claude) to **explore, understand, and interact with any API that has an OpenAPI/Swagger specification**.
+## Instalación
 
-Instead of manually copying and pasting API documentation, this server enables the model to dynamically query:
-- Available endpoints.
-- Parameters required for each route.
-- Exact data schemas (JSON Schema) for requests and responses.
-- Organization of features via tags.
+### Usando npx (Recomendado)
 
-It's perfect for developers who need to integrate third-party APIs or explore their own local APIs with AI assistance.
-
-## Installation
-
-### Using npx (Recommended)
-
-You can run the server directly without installation using `npx`:
+Puedes ejecutar el servidor directamente sin instalación previa usando `npx`:
 
 ```bash
 npx @nonetss/none.api
 ```
 
-### Global Installation
+### Instalación Global
 
-To install globally via npm:
+Para instalarlo globalmente vía npm:
 
 ```bash
 npm install -g @nonetss/none.api
 ```
 
-## MCP Configuration
+## Configuración de MCP
 
-Add this to your `claude_desktop_config.json` or equivalent (like Cursor):
+Añade esto a tu archivo `claude_desktop_config.json` o equivalente (como Cursor):
 
 ```json
 {
@@ -62,17 +52,17 @@ Add this to your `claude_desktop_config.json` or equivalent (like Cursor):
 }
 ```
 
-## Features
+## Características
 
-- **List Endpoints**: See all available routes.
-- **Search by Tag**: Filter endpoints by their functional category.
-- **Detailed Info**: Get full operation details.
-- **Schema Extraction**: Extract specific Request and Response JSON schemas.
-- **Tag Discovery**: List all API sections.
+- **Listar Endpoints**: Ver todas las rutas disponibles.
+- **Buscar por Etiqueta**: Filtrar endpoints por su categoría funcional.
+- **Información Detallada**: Obtener todos los detalles de una operación.
+- **Extracción de Esquemas**: Extraer esquemas JSON específicos de Petición (Request) y Respuesta (Response).
+- **Descubrimiento de Etiquetas**: Listar todas las secciones de la API.
 
-## Development
+## Desarrollo
 
-1. Clone the repo
+1. Clona el repositorio
 2. `npm install`
 3. `npm run build`
-4. Set `OPENAPI_URL` environment variable for testing.
+4. Configura la variable de entorno `OPENAPI_URL` para realizar pruebas.
