@@ -1,8 +1,10 @@
 import { openApiService } from "../services/openapi.service.js";
 
 export async function handleToolCall(name: string, args: any) {
-  const url = String(args?.url);
-  if (!url) throw new Error("URL is required");
+  const url = String(args?.url || process.env.OPENAPI_URL || "");
+  if (!url) {
+    throw new Error("No OpenAPI URL provided. Please provide a 'url' argument or set the 'OPENAPI_URL' environment variable in your MCP configuration.");
+  }
 
   switch (name) {
     case "list_endpoints": {

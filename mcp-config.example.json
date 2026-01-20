@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "none.api": {
+      "command": "node",
+      "args": ["/absolute/path/to/openapi/build/index.js"],
+      "env": {
+        "OPENAPI_URL": "http://localhost:3000/doc"
+      }
+    }
+  }
+}
