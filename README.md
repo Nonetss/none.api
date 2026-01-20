@@ -4,21 +4,25 @@ Professional OpenAPI Explorer Model Context Protocol (MCP) server.
 
 ## Installation
 
-To install from GitHub Packages, you need to configure your `.npmrc` to point to the GitHub registry:
+### Using npx (Recommended)
+
+You can run the server directly without installation using `npx`:
 
 ```bash
-echo "@nonetss:registry=https://npm.pkg.github.com" >> .npmrc
+npx @nonetss/none.api
 ```
 
-Then install via npm:
+### Global Installation
+
+To install globally via npm:
 
 ```bash
-npm install @nonetss/none.api
+npm install -g @nonetss/none.api
 ```
 
 ## MCP Configuration
 
-Add this to your `claude_desktop_config.json` or equivalent:
+Add this to your `claude_desktop_config.json` or equivalent (like Cursor):
 
 ```json
 {

@@ -6,9 +6,6 @@
     "type": "git",
     "url": "git+https://github.com/Nonetss/none.api.git"
   },
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
-  },
   "private": false,
   "type": "module",
   "bin": {
