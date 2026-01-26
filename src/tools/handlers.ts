@@ -55,6 +55,81 @@ export async function handleToolCall(name: string, args: any) {
       return { content: [{ type: "text", text }] };
     }
 
+    case "get_typescript_types": {
+      const path = String(args.path);
+      const method = String(args.method);
+      const op = await openApiService.getEndpointInfo(url, path, method);
+      
+      let ts = "";
+      const reqSchema = (op as any)?.requestBody?.content?.["application/json"]?.schema;
+      if (reqSchema) {
+        ts += openApiService.jsonSchemaToTypeScript(reqSchema, "Request") + "\n\n";
+      }
+      
+      const resSchema = (op as any)?.responses?.["200"]?.content?.["application/json"]?.schema 
+                    || (op as any)?.responses?.["201"]?.content?.["application/json"]?.schema;
+      if (resSchema) {
+        ts += openApiService.jsonSchemaToTypeScript(resSchema, "Response");
+      }
+      
+      return { content: [{ type: "text", text: ts || "No JSON schemas found for this endpoint." }] };
+    }
+
+    case "get_zod_schema": {
+      const op = await openApiService.getEndpointInfo(url, String(args.path), String(args.method));
+      const schema = (op as any)?.requestBody?.content?.["application/json"]?.schema;
+      if (!schema) return { content: [{ type: "text", text: "No JSON request body schema found." }] };
+      return { content: [{ type: "text", text: openApiService.jsonSchemaToZod(schema) }] };
+    }
+
+    case "get_fetch_snippet": {
+      const path = String(args.path);
+      const method = String(args.method).toUpperCase();
+      const op = await openApiService.getEndpointInfo(url, path, method);
+      
+      const hasBody = ["POST", "PUT", "PATCH"].includes(method);
+      const parameters = (op as any).parameters || [];
+      const queryParams = parameters.filter((p: any) => p.in === "query");
+      
+      let code = `async function callApi(data) {\n`;
+      code += `  const url = new URL('${path}', 'YOUR_BASE_URL');\n`;
+      if (queryParams.length > 0) {
+        code += `  // Query parameters\n`;
+        queryParams.forEach((p: any) => {
+          code += `  if (data.${p.name}) url.searchParams.append('${p.name}', data.${p.name});\n`;
+        });
+      }
+      
+      code += `\n  const response = await fetch(url.toString(), {\n`;
+      code += `    method: '${method}',\n`;
+      code += `    headers: {\n`;
+      code += `      'Content-Type': 'application/json',\n`;
+      code += `    },\n`;
+      if (hasBody) {
+        code += `    body: JSON.stringify(data),\n`;
+      }
+      code += `  });\n\n`;
+      code += `  return response.json();\n`;
+      code += `}`;
+      
+      return { content: [{ type: "text", text: code }] };
+    }
+
+    case "get_mock_data": {
+      const op = await openApiService.getEndpointInfo(url, String(args.path), String(args.method));
+      const resSchema = (op as any)?.responses?.["200"]?.content?.["application/json"]?.schema 
+                    || (op as any)?.responses?.["201"]?.content?.["application/json"]?.schema;
+      
+      if (!resSchema) return { content: [{ type: "text", text: "No success response schema found." }] };
+      const mock = openApiService.generateMockData(resSchema);
+      return { content: [{ type: "text", text: JSON.stringify(mock, null, 2) }] };
+    }
+
+    case "get_security_info": {
+      const details = await openApiService.getSecurityDetails(url, args.path ? String(args.path) : undefined, args.method ? String(args.method) : undefined);
+      return { content: [{ type: "text", text: JSON.stringify(details, null, 2) }] };
+    }
+
     default:
       throw new Error(`Unknown tool: ${name}`);
   }

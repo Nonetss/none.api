@@ -73,4 +73,68 @@ export const TOOLS: Tool[] = [
       },
     },
   },
+  {
+    name: "get_typescript_types",
+    description: "Generate TypeScript interfaces for an endpoint's request and response schemas.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        url: { type: "string", description: "Optional: OpenAPI URL" },
+        path: { type: "string" },
+        method: { type: "string" },
+      },
+      required: ["path", "method"],
+    },
+  },
+  {
+    name: "get_zod_schema",
+    description: "Generate Zod validation schema for an endpoint's request body.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        url: { type: "string", description: "Optional: OpenAPI URL" },
+        path: { type: "string" },
+        method: { type: "string" },
+      },
+      required: ["path", "method"],
+    },
+  },
+  {
+    name: "get_fetch_snippet",
+    description: "Generate a ready-to-use JavaScript fetch snippet for an endpoint.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        url: { type: "string", description: "Optional: OpenAPI URL" },
+        path: { type: "string" },
+        method: { type: "string" },
+      },
+      required: ["path", "method"],
+    },
+  },
+  {
+    name: "get_mock_data",
+    description: "Generate mock JSON data based on examples defined in the OpenAPI spec.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        url: { type: "string", description: "Optional: OpenAPI URL" },
+        path: { type: "string" },
+        method: { type: "string" },
+      },
+      required: ["path", "method"],
+    },
+  },
+  {
+    name: "get_security_info",
+    description: "Get security and authentication requirements for the API or a specific endpoint.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        url: { type: "string", description: "Optional: OpenAPI URL" },
+        path: { type: "string" },
+        method: { type: "string" },
+      },
+    },
+  },
 ];
