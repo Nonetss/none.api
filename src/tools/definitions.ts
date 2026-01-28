@@ -155,6 +155,97 @@ export const TOOLS: Tool[] = [
     },
   },
   {
+    name: "search_by_tag",
+    description: "Search for endpoints by tag.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        tag: {
+          type: "string",
+          description: "The tag to search for.",
+        },
+      },
+      required: ["tag"],
+    },
+  },
+  {
+    name: "get_request_schema",
+    description: "Get the JSON request body schema for an endpoint.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        path: { type: "string" },
+        method: { type: "string" },
+      },
+      required: ["path", "method"],
+    },
+  },
+  {
+    name: "get_response_schema",
+    description: "Get the JSON response body schema for an endpoint.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        path: { type: "string" },
+        method: { type: "string" },
+        statusCode: {
+          type: "string",
+          description: "HTTP status code (default: '200')",
+        },
+      },
+      required: ["path", "method"],
+    },
+  },
+  {
+    name: "list_tags",
+    description: "List all tags available in the OpenAPI specification.",
+    inputSchema: {
+      type: "object",
+      properties: {},
+    },
+  },
+  {
+    name: "get_fetch_snippet",
+    description: "Generate a fetch code snippet for an endpoint.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        path: { type: "string" },
+        method: { type: "string" },
+      },
+      required: ["path", "method"],
+    },
+  },
+  {
+    name: "get_security_info",
+    description: "Get security requirements for the API or a specific endpoint.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        path: { type: "string" },
+        method: { type: "string" },
+      },
+    },
+  },
+  {
+    name: "set_security_context",
+    description: "Set authentication headers to be used for subsequent 'call_endpoint' requests.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        headers: {
+          type: "object",
+          description: "Headers to include (e.g., { 'Authorization': 'Bearer ...' })",
+        },
+        scope: {
+          type: "string",
+          description: "Optional scope for these headers (e.g., 'global' or a specific tag).",
+        },
+      },
+      required: ["headers"],
+    },
+  },
+  {
     name: "call_endpoint",
     description:
       "DEBUG: Execute a real HTTP request to the configured API to verify live behavior and connectivity.",
