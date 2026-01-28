@@ -42,15 +42,22 @@ npm install -g @nonetss/none.api
 | Tool                    | Focus        | Description                                                    |
 | :---------------------- | :----------- | :------------------------------------------------------------- |
 | `list_endpoints`        | Exploration  | Lists all endpoints grouped by functional categories.          |
+| `list_tags`             | Exploration  | Lists all tags (functional categories) in the API.             |
+| `search_by_tag`         | Exploration  | Lists all endpoints associated with a specific tag.            |
 | `find_endpoint`         | Exploration  | Intelligent search by intent or keyword (e.g., "delete user"). |
 | `get_endpoint_info`     | Analysis     | Detailed documentation, parameters, and response codes.        |
+| `get_request_schema`    | Analysis     | Returns the JSON schema for an endpoint's request body.        |
+| `get_response_schema`   | Analysis     | Returns the JSON schema for a specific response status code.   |
 | `get_typescript_types`  | Frontend     | Generates ready-to-use TypeScript interfaces.                  |
 | `get_zod_schema`        | Frontend     | Generates Zod validation schemas.                              |
 | `get_framework_snippet` | Frontend     | Generates Axios or TanStack Query code.                        |
-| `validate_response`     | Backend      | Validates a JSON object against the API contract.              |
+| `get_fetch_snippet`     | Frontend     | Generates a native fetch snippet for quick integration.        |
 | `get_mock_data`         | Prototyping  | Generates high-fidelity mock data based on schemas.            |
 | `map_dependencies`      | Architecture | Analyzes data flow and ID relationships between routes.        |
+| `get_security_info`     | Security     | Shows security requirements for the API or specific routes.    |
+| `set_security_context`  | Security     | Sets authentication headers for subsequent requests.           |
 | `call_endpoint`         | Debug        | Executes real HTTP calls to the configured API.                |
+| `validate_response`     | Backend      | Validates a JSON object against the API contract.              |
 
 ### Configuration
 
