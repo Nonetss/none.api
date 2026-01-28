@@ -2,9 +2,7 @@
   "mcpServers": {
     "openapi-explorer": {
       "command": "node",
-      "args": [
-        "/absolute/path/to/openapi/build/index.js"
-      ],
+      "args": ["/absolute/path/to/openapi/build/index.js"],
       "env": {
         "OPENAPI_URL": "https://api.example.com/openapi.json",
         "AUTH_EMAIL": "user@example.com",

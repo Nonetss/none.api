@@ -8,16 +8,21 @@ import * as frameworkUtils from "@/services/openapi/framework-utils.js";
 import * as specAnalyzer from "@/services/openapi/spec-analyzer.js";
 
 export class OpenApiService {
-  private securityContexts: { scope: string; headers: Record<string, string> }[] = [];
+  private securityContexts: {
+    scope: string;
+    headers: Record<string, string>;
+  }[] = [];
   private jar: CookieJar;
   private client: AxiosInstance;
 
   constructor() {
     this.jar = new CookieJar();
-    this.client = wrapper(axios.create({ 
-      jar: this.jar, 
-      withCredentials: true 
-    }));
+    this.client = wrapper(
+      axios.create({
+        jar: this.jar,
+        withCredentials: true,
+      }),
+    );
   }
 
   public async ensureAuthenticated(specUrl: string) {
@@ -37,32 +42,47 @@ export class OpenApiService {
     if (cookies.length > 0) return;
 
     try {
-      const authUrl = authPath.startsWith("http") ? authPath : `${baseUrl}${authPath}`;
+      const authUrl = authPath.startsWith("http")
+        ? authPath
+        : `${baseUrl}${authPath}`;
       console.error(`[OpenAPI] Attempting authentication to ${authUrl}...`);
-      
-      const response = await this.client.post(authUrl, { email, password }, {
-        headers: { 
-          'Content-Type': 'application/json',
-          'Origin': baseUrl
-        }
-      });
-      
-      console.error(`[OpenAPI] Authentication successful: ${response.status} ${response.statusText}`);
+
+      const response = await this.client.post(
+        authUrl,
+        { email, password },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Origin: baseUrl,
+          },
+        },
+      );
+
+      console.error(
+        `[OpenAPI] Authentication successful: ${response.status} ${response.statusText}`,
+      );
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
-      const details = (error as any).response?.data ? JSON.stringify((error as any).response.data) : "";
+      const details = (error as any).response?.data
+        ? JSON.stringify((error as any).response.data)
+        : "";
       console.error(`[OpenAPI] Authentication failed: ${message} ${details}`);
     }
   }
 
   setSecurityContext(headers: Record<string, string>, scope: string = "*") {
-    this.securityContexts = this.securityContexts.filter(s => s.scope !== scope);
+    this.securityContexts = this.securityContexts.filter(
+      (s) => s.scope !== scope,
+    );
     this.securityContexts.push({ scope, headers });
   }
 
-  getSecurityHeaders(path: string, tags: string[] = []): Record<string, string> {
+  getSecurityHeaders(
+    path: string,
+    tags: string[] = [],
+  ): Record<string, string> {
     let headers = {};
-    const global = this.securityContexts.find(s => s.scope === "*");
+    const global = this.securityContexts.find((s) => s.scope === "*");
     if (global) headers = { ...global.headers };
 
     for (const context of this.securityContexts) {
@@ -82,7 +102,7 @@ export class OpenApiService {
       } catch (e) {}
 
       const response = await this.client.get(url, {
-        headers: origin ? { 'Origin': origin, 'Referer': origin + "/" } : {}
+        headers: origin ? { Origin: origin, Referer: origin + "/" } : {},
       });
       const spec = await SwaggerParser.dereference(response.data);
       return spec as OpenAPI.Document;
@@ -91,7 +111,9 @@ export class OpenApiService {
         const spec = await SwaggerParser.dereference(url);
         return spec as OpenAPI.Document;
       } catch (innerError) {
-        throw new Error(`Failed to parse OpenAPI spec from ${url}: ${error instanceof Error ? error.message : String(error)}`);
+        throw new Error(
+          `Failed to parse OpenAPI spec from ${url}: ${error instanceof Error ? error.message : String(error)}`,
+        );
       }
     }
   }
@@ -130,7 +152,12 @@ export class OpenApiService {
     return schemaUtils.generateMockData(schema, name);
   }
 
-  getFrameworkSnippet(path: string, method: string, framework: 'axios' | 'tanstack-query', op: any): string {
+  getFrameworkSnippet(
+    path: string,
+    method: string,
+    framework: "axios" | "tanstack-query",
+    op: any,
+  ): string {
     return frameworkUtils.getFrameworkSnippet(path, method, framework, op);
   }
 
@@ -145,26 +172,30 @@ export class OpenApiService {
   }
 
   async callEndpoint(
-    specUrl: string, 
-    path: string, 
-    method: string, 
+    specUrl: string,
+    path: string,
+    method: string,
     options: {
-      baseUrl?: string; 
-      parameters?: Record<string, any>; 
-      body?: any; 
-      headers?: Record<string, any>
-    }
+      baseUrl?: string;
+      parameters?: Record<string, any>;
+      body?: any;
+      headers?: Record<string, any>;
+    },
   ) {
-    const spec = await this.getSpec(specUrl) as any;
+    const spec = (await this.getSpec(specUrl)) as any;
     const op = spec.paths?.[path]?.[method.toLowerCase()] || {};
     const tags = op.tags || [];
-    
+
     let baseUrl = options.baseUrl;
 
     if (!baseUrl) {
       if (spec.servers && spec.servers.length > 0) {
         baseUrl = spec.servers[0].url;
-        if (baseUrl && !baseUrl.startsWith("http") && specUrl.startsWith("http")) {
+        if (
+          baseUrl &&
+          !baseUrl.startsWith("http") &&
+          specUrl.startsWith("http")
+        ) {
           try {
             baseUrl = new URL(baseUrl, specUrl).toString();
           } catch (e) {}
@@ -174,7 +205,9 @@ export class OpenApiService {
           const url = new URL(specUrl);
           baseUrl = `${url.protocol}//${url.host}`;
         } catch (e) {
-          throw new Error("Could not infer Base URL. Please provide 'baseUrl'.");
+          throw new Error(
+            "Could not infer Base URL. Please provide 'baseUrl'.",
+          );
         }
       }
     }
@@ -198,31 +231,34 @@ export class OpenApiService {
     await this.ensureAuthenticated(specUrl);
 
     try {
-      const origin = (baseUrl && baseUrl.startsWith("http")) ? new URL(baseUrl).origin : undefined;
-      
+      const origin =
+        baseUrl && baseUrl.startsWith("http")
+          ? new URL(baseUrl).origin
+          : undefined;
+
       const response = await this.client({
         method: method.toLowerCase(),
         url: fullUrl.toString(),
         data: options.body,
         headers: {
-          'Content-Type': 'application/json',
-          ...(origin ? { 'Origin': origin, 'Referer': origin + "/" } : {}),
+          "Content-Type": "application/json",
+          ...(origin ? { Origin: origin, Referer: origin + "/" } : {}),
           ...securityHeaders,
-          ...options.headers
+          ...options.headers,
         },
-        validateStatus: () => true 
+        validateStatus: () => true,
       });
 
       return {
         status: response.status,
         statusText: response.statusText,
         headers: response.headers,
-        data: response.data
+        data: response.data,
       };
     } catch (error: any) {
       return {
         error: error.message,
-        details: error.response?.data
+        details: error.response?.data,
       };
     }
   }

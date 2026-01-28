@@ -16,7 +16,7 @@ export function createServer() {
       capabilities: {
         tools: {},
       },
-    }
+    },
   );
 
   server.setRequestHandler(ListToolsRequestSchema, async () => ({
@@ -25,10 +25,18 @@ export function createServer() {
 
   server.setRequestHandler(CallToolRequestSchema, async (request) => {
     try {
-      return await handleToolCall(request.params.name, request.params.arguments);
+      return await handleToolCall(
+        request.params.name,
+        request.params.arguments,
+      );
     } catch (error) {
       return {
-        content: [{ type: "text", text: `Error: ${error instanceof Error ? error.message : String(error)}` }],
+        content: [
+          {
+            type: "text",
+            text: `Error: ${error instanceof Error ? error.message : String(error)}`,
+          },
+        ],
         isError: true,
       };
     }

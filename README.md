@@ -7,6 +7,7 @@ Professional OpenAPI explorer for the Model Context Protocol (MCP).
 This MCP server allows Large Language Models (LLMs) like Claude or Cursor to **dynamically explore, understand, and interact with any API** that has an OpenAPI/Swagger specification.
 
 It acts as an intelligent inspector, allowing the model to:
+
 - List available endpoints and methods.
 - Search operations by functional tags.
 - Retrieve detailed information and documentation for specific routes.
@@ -32,6 +33,7 @@ Add this to your `claude_desktop_config.json` or equivalent (like Cursor):
 ```
 
 ### Features
+
 - **Endpoint Listing**: Overview of all available routes.
 - **Tag Discovery**: List functional sections of the API.
 - **Granular Schemas**: Fetch specific JSON Schemas for precise code generation.
