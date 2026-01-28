@@ -88,13 +88,15 @@ export const TOOLS: Tool[] = [
   },
   {
     name: "get_zod_schema",
-    description: "Generate Zod validation schema for an endpoint's request body.",
+    description: "Generate Zod validation schema for an endpoint's request or response body.",
     inputSchema: {
       type: "object",
       properties: {
         url: { type: "string", description: "Optional: OpenAPI URL" },
         path: { type: "string" },
         method: { type: "string" },
+        target: { type: "string", enum: ["request", "response"], description: "Generate schema for request body or response body (default: 'request')" },
+        statusCode: { type: "string", description: "HTTP status code for response (default: '200')" },
       },
       required: ["path", "method"],
     },
@@ -135,6 +137,72 @@ export const TOOLS: Tool[] = [
         path: { type: "string" },
         method: { type: "string" },
       },
+    },
+  },
+  {
+    name: "call_endpoint",
+    description: "Make a real HTTP request to an API endpoint.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        url: { type: "string", description: "Optional: OpenAPI specification URL" },
+        path: { type: "string", description: "Endpoint path" },
+        method: { type: "string", description: "HTTP method" },
+        baseUrl: { type: "string", description: "Base URL of the API (if not inferred from spec)" },
+        parameters: { type: "object", description: "Path and query parameters" },
+        body: { type: "object", description: "Request body for POST/PUT/PATCH" },
+        headers: { type: "object", description: "Custom headers (merged with security context)" },
+      },
+      required: ["path", "method"],
+    },
+  },
+  {
+    name: "set_security_context",
+    description: "Set security headers for a specific scope (tag, path prefix, or '*' for global).",
+    inputSchema: {
+      type: "object",
+      properties: {
+        headers: { type: "object", description: "Headers to include (e.g., {'Authorization': 'Bearer ...'})" },
+        scope: { type: "string", description: "Scope: tag name, path prefix, or '*' (default: '*')" },
+      },
+      required: ["headers"],
+    },
+  },
+  {
+    name: "find_endpoint",
+    description: "Search for endpoints by intent, description, or keyword.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        url: { type: "string", description: "Optional: OpenAPI URL" },
+        query: { type: "string", description: "Search term (e.g., 'upload photo', 'delete user')" },
+      },
+      required: ["query"],
+    },
+  },
+  {
+    name: "map_dependencies",
+    description: "Analyze relationships between endpoints to see which endpoints provide data needed by others.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        url: { type: "string", description: "Optional: OpenAPI URL" },
+        resourceName: { type: "string", description: "Optional: Filter by resource name (e.g., 'user', 'order')" },
+      },
+    },
+  },
+  {
+    name: "get_framework_snippet",
+    description: "Generate production-ready code for specific frameworks (Axios, TanStack Query).",
+    inputSchema: {
+      type: "object",
+      properties: {
+        url: { type: "string", description: "Optional: OpenAPI URL" },
+        path: { type: "string" },
+        method: { type: "string" },
+        framework: { type: "string", enum: ["axios", "tanstack-query"], description: "Target framework" },
+      },
+      required: ["path", "method", "framework"],
     },
   },
 ];

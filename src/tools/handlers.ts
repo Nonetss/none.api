@@ -9,7 +9,7 @@ export async function handleToolCall(name: string, args: any) {
   switch (name) {
     case "list_endpoints": {
       const endpoints = await openApiService.getEndpoints(url);
-      const text = endpoints.map(e => `${e.method} ${e.path} - ${e.summary}`).join("\n");
+      const text = endpoints.map(e => `${e.method} ${e.fullPath || e.path} - ${e.summary}`).join("\n");
       return { content: [{ type: "text", text }] };
     }
 
@@ -76,9 +76,23 @@ export async function handleToolCall(name: string, args: any) {
     }
 
     case "get_zod_schema": {
-      const op = await openApiService.getEndpointInfo(url, String(args.path), String(args.method));
-      const schema = (op as any)?.requestBody?.content?.["application/json"]?.schema;
-      if (!schema) return { content: [{ type: "text", text: "No JSON request body schema found." }] };
+      const path = String(args.path);
+      const method = String(args.method);
+      const target = args.target || "request";
+      const statusCode = String(args.statusCode || "200");
+      
+      const op = await openApiService.getEndpointInfo(url, path, method);
+      let schema;
+      
+      if (target === "request") {
+        schema = (op as any)?.requestBody?.content?.["application/json"]?.schema;
+      } else {
+        let response = (op as any)?.responses?.[statusCode];
+        if (!response && statusCode === "200") response = (op as any)?.responses?.["201"];
+        schema = response?.content?.["application/json"]?.schema;
+      }
+
+      if (!schema) return { content: [{ type: "text", text: `No JSON schema found for ${target}.` }] };
       return { content: [{ type: "text", text: openApiService.jsonSchemaToZod(schema) }] };
     }
 
@@ -128,6 +142,44 @@ export async function handleToolCall(name: string, args: any) {
     case "get_security_info": {
       const details = await openApiService.getSecurityDetails(url, args.path ? String(args.path) : undefined, args.method ? String(args.method) : undefined);
       return { content: [{ type: "text", text: JSON.stringify(details, null, 2) }] };
+    }
+
+    case "call_endpoint": {
+      const result = await openApiService.callEndpoint(url, String(args.path), String(args.method), {
+        baseUrl: args.baseUrl,
+        parameters: args.parameters,
+        body: args.body,
+        headers: args.headers
+      });
+      return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+    }
+
+    case "set_security_context": {
+      openApiService.setSecurityContext(args.headers, args.scope);
+      return { content: [{ type: "text", text: `Security context updated for scope: ${args.scope || '*'}.` }] };
+    }
+
+    case "find_endpoint": {
+      const results = await openApiService.findEndpoints(url, String(args.query));
+      const text = results.length > 0 
+        ? results.map(e => `${e.method} ${e.fullPath || e.path} - ${e.summary}`).join("\n")
+        : "No endpoints matched your search.";
+      return { content: [{ type: "text", text }] };
+    }
+
+    case "map_dependencies": {
+      const result = await openApiService.mapDependencies(url, args.resourceName ? String(args.resourceName) : undefined);
+      let text = "### Data Providers (Endpoints that return IDs):\n";
+      result.providers.forEach(p => text += `- ${p.method} ${p.path} (Provides: ${p.provides})\n`);
+      text += "\n### Data Consumers (Endpoints that require IDs):\n";
+      result.consumers.forEach(c => text += `- ${c.method} ${c.path} (Consumes: ${c.consumes} in ${c.in})\n`);
+      return { content: [{ type: "text", text }] };
+    }
+
+    case "get_framework_snippet": {
+      const op = await openApiService.getEndpointInfo(url, String(args.path), String(args.method));
+      const snippet = openApiService.getFrameworkSnippet(String(args.path), String(args.method), args.framework as any, op);
+      return { content: [{ type: "text", text: snippet }] };
     }
 
     default:
