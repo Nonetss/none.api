@@ -4,15 +4,10 @@ export const TOOLS: Tool[] = [
   {
     name: "list_endpoints",
     description:
-      "EXPLORACIÓN INICIAL: Lista todos los endpoints y métodos disponibles en la API. Úsalo como primer paso para conocer las capacidades del sistema. Si no proporcionas una URL, se usará la API configurada por defecto.",
+      "EXPLORACIÓN INICIAL: Lista todos los endpoints y métodos disponibles en la API configurada. Úsalo como primer paso para conocer las capacidades del sistema.",
     inputSchema: {
       type: "object",
       properties: {
-        url: {
-          type: "string",
-          description:
-            "Opcional: URL del JSON/YAML de OpenAPI. Si se omite, usa la API principal.",
-        },
         limit: {
           type: "number",
           description: "Límite de resultados a mostrar (default: 50).",
@@ -31,10 +26,6 @@ export const TOOLS: Tool[] = [
     inputSchema: {
       type: "object",
       properties: {
-        url: {
-          type: "string",
-          description: "Opcional: URL de la especificación OpenAPI.",
-        },
         tag: { type: "string", description: "Nombre del tag para filtrar." },
       },
       required: ["tag"],
@@ -47,13 +38,9 @@ export const TOOLS: Tool[] = [
     inputSchema: {
       type: "object",
       properties: {
-        url: {
-          type: "string",
-          description: "Opcional: URL de la especificación OpenAPI.",
-        },
         path: {
           type: "string",
-          description: "Ruta del endpoint (ej: '/users/{id}')",
+          description: "Ruta del endpoint (ej: '/api/v1/users')",
         },
         method: {
           type: "string",
@@ -70,10 +57,6 @@ export const TOOLS: Tool[] = [
     inputSchema: {
       type: "object",
       properties: {
-        url: {
-          type: "string",
-          description: "Opcional: URL de la especificación OpenAPI.",
-        },
         path: { type: "string" },
         method: { type: "string" },
       },
@@ -87,10 +70,6 @@ export const TOOLS: Tool[] = [
     inputSchema: {
       type: "object",
       properties: {
-        url: {
-          type: "string",
-          description: "Opcional: URL de la especificación OpenAPI.",
-        },
         path: { type: "string" },
         method: { type: "string" },
         statusCode: {
@@ -107,12 +86,7 @@ export const TOOLS: Tool[] = [
       "ORGANIZACIÓN DE LA API: Lista todas las etiquetas (categorías) definidas en la API. Ayuda a entender la estructura lógica de los recursos.",
     inputSchema: {
       type: "object",
-      properties: {
-        url: {
-          type: "string",
-          description: "Opcional: URL de la especificación OpenAPI.",
-        },
-      },
+      properties: {},
     },
   },
   {
@@ -122,10 +96,6 @@ export const TOOLS: Tool[] = [
     inputSchema: {
       type: "object",
       properties: {
-        url: {
-          type: "string",
-          description: "Opcional: URL de la especificación OpenAPI.",
-        },
         path: { type: "string" },
         method: { type: "string" },
       },
@@ -135,14 +105,10 @@ export const TOOLS: Tool[] = [
   {
     name: "get_zod_schema",
     description:
-      "VALIDACIÓN: Genera un esquema de validación Zod para el cuerpo de la petición o respuesta. Ideal para implementar validaciones en el frontend o backend.",
+      "VALIDACIÓN: Genera un esquema de validación Zod para el cuerpo de la petición o respuesta.",
     inputSchema: {
       type: "object",
       properties: {
-        url: {
-          type: "string",
-          description: "Opcional: URL de la especificación OpenAPI.",
-        },
         path: { type: "string" },
         method: { type: "string" },
         target: {
@@ -165,10 +131,6 @@ export const TOOLS: Tool[] = [
     inputSchema: {
       type: "object",
       properties: {
-        url: {
-          type: "string",
-          description: "Opcional: URL de la especificación OpenAPI.",
-        },
         path: { type: "string" },
         method: { type: "string" },
       },
@@ -178,14 +140,10 @@ export const TOOLS: Tool[] = [
   {
     name: "get_mock_data",
     description:
-      "DATOS DE PRUEBA: Genera un ejemplo de datos ficticios (mock) basados en los esquemas de la API. Muy útil para prototipado rápido.",
+      "DATOS DE PRUEBA: Genera un ejemplo de datos ficticios (mock) basados en los esquemas de la API.",
     inputSchema: {
       type: "object",
       properties: {
-        url: {
-          type: "string",
-          description: "Opcional: URL de la especificación OpenAPI.",
-        },
         path: { type: "string" },
         method: { type: "string" },
       },
@@ -195,14 +153,10 @@ export const TOOLS: Tool[] = [
   {
     name: "get_security_info",
     description:
-      "AUTENTICACIÓN: Muestra los requisitos de seguridad (Bearer, API Key, etc.) necesarios para interactuar con la API o un endpoint específico.",
+      "AUTENTICACIÓN: Muestra los requisitos de seguridad necesarios para interactuar con la API o un endpoint específico.",
     inputSchema: {
       type: "object",
       properties: {
-        url: {
-          type: "string",
-          description: "Opcional: URL de la especificación OpenAPI.",
-        },
         path: { type: "string" },
         method: { type: "string" },
       },
@@ -211,20 +165,16 @@ export const TOOLS: Tool[] = [
   {
     name: "call_endpoint",
     description:
-      "EJECUCIÓN REAL: Realiza una petición HTTP real a la API. Debe usarse con precaución y solo después de haber verificado los parámetros requeridos con 'get_endpoint_info'.",
+      "EJECUCIÓN REAL: Realiza una petición HTTP real a la API. Debe usarse con precaución.",
     inputSchema: {
       type: "object",
       properties: {
-        url: {
-          type: "string",
-          description: "Opcional: URL de la especificación OpenAPI.",
-        },
         path: { type: "string", description: "Ruta del endpoint." },
         method: { type: "string", description: "Método HTTP." },
         baseUrl: {
           type: "string",
           description:
-            "URL base de ejecución (si no se detecta automáticamente).",
+            "URL base de ejecución (opcional, usa la de la spec por defecto).",
         },
         parameters: {
           type: "object",
@@ -239,7 +189,7 @@ export const TOOLS: Tool[] = [
   {
     name: "set_security_context",
     description:
-      "CONFIGURACIÓN DE ACCESO: Establece cabeceras de seguridad globales (como 'Authorization') que se usarán en todas las llamadas posteriores. No requiere una URL de OpenAPI.",
+      "CONFIGURACIÓN DE ACCESO: Establece cabeceras de seguridad globales (como 'Authorization').",
     inputSchema: {
       type: "object",
       properties: {
@@ -264,10 +214,6 @@ export const TOOLS: Tool[] = [
     inputSchema: {
       type: "object",
       properties: {
-        url: {
-          type: "string",
-          description: "Opcional: URL de la especificación OpenAPI.",
-        },
         query: {
           type: "string",
           description: "Término de búsqueda o intención del usuario.",
@@ -279,14 +225,10 @@ export const TOOLS: Tool[] = [
   {
     name: "map_dependencies",
     description:
-      "ANÁLISIS DE FLUJO: Analiza qué endpoints proporcionan datos (IDs) que otros necesitan. Ayuda a entender el orden en que deben llamarse las operaciones.",
+      "ANÁLISIS DE FLUJO: Analiza qué endpoints proporcionan datos (IDs) que otros necesitan.",
     inputSchema: {
       type: "object",
       properties: {
-        url: {
-          type: "string",
-          description: "Opcional: URL de la especificación OpenAPI.",
-        },
         resourceName: {
           type: "string",
           description: "Opcional: Filtrar por recurso (ej: 'user').",
@@ -297,14 +239,10 @@ export const TOOLS: Tool[] = [
   {
     name: "get_framework_snippet",
     description:
-      "CÓDIGO DE PRODUCCIÓN: Genera implementaciones completas para frameworks modernos (Axios o TanStack Query) incluyendo tipos y manejo básico de errores.",
+      "CÓDIGO DE PRODUCCIÓN: Genera implementaciones completas para frameworks modernos (Axios o TanStack Query).",
     inputSchema: {
       type: "object",
       properties: {
-        url: {
-          type: "string",
-          description: "Opcional: URL de la especificación OpenAPI.",
-        },
         path: { type: "string" },
         method: { type: "string" },
         framework: {

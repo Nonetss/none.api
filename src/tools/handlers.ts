@@ -1,10 +1,12 @@
 import * as handlers from "@/tools/handlers/index.js";
 
 export async function handleToolCall(name: string, args: any) {
-  const url = String(args?.url || process.env.OPENAPI_URL || "");
+  // Sacred URL from environment variables only
+  const url = process.env.OPENAPI_URL || "";
+
   if (!url && name !== "set_security_context") {
     throw new Error(
-      "No OpenAPI URL provided. Please provide a 'url' argument or set the 'OPENAPI_URL' environment variable in your MCP configuration.",
+      "OPENAPI_URL environment variable is not set in the MCP configuration. This server is locked to its environment configuration.",
     );
   }
 

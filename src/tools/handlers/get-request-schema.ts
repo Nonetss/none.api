@@ -6,8 +6,18 @@ export async function getRequestSchema(url: string, args: any) {
     String(args.path),
     String(args.method),
   );
-  const schema = (op as any)?.requestBody?.content?.["application/json"]
-    ?.schema;
+
+  // OpenAPI v3 style
+  let schema = (op as any)?.requestBody?.content?.["application/json"]?.schema;
+
+  // Swagger v2 style (parameters with in: 'body')
+  if (!schema && (op as any).parameters) {
+    const bodyParam = (op as any).parameters.find((p: any) => p.in === "body");
+    if (bodyParam) {
+      schema = bodyParam.schema;
+    }
+  }
+
   if (!schema)
     return {
       content: [{ type: "text", text: "No JSON request body schema found." }],

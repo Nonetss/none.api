@@ -53,13 +53,16 @@ export async function findEndpoints(
   query: string,
 ): Promise<EndpointInfo[]> {
   const endpoints = await getEndpoints(spec);
-  const q = query.toLowerCase();
-  return endpoints.filter(
-    (e) =>
-      e.path.toLowerCase().includes(q) ||
-      e.summary.toLowerCase().includes(q) ||
-      e.method.toLowerCase() === q,
-  );
+  const words = query
+    .toLowerCase()
+    .split(/\s+/)
+    .filter((w) => w.length > 0);
+
+  return endpoints.filter((e) => {
+    const searchText = `${e.method} ${e.path} ${e.summary}`.toLowerCase();
+    // Debe contener todas las palabras de la búsqueda
+    return words.every((word) => searchText.includes(word));
+  });
 }
 
 export async function getTags(
@@ -113,7 +116,8 @@ export async function mapDependencies(
 
       if (resSchema) {
         const props =
-          resSchema.properties || (resSchema.items as any)?.properties;
+          resSchema.properties || (resSchema as any).items?.properties;
+
         if (props) {
           for (const prop of Object.keys(props)) {
             if (prop.toLowerCase().endsWith("id")) {

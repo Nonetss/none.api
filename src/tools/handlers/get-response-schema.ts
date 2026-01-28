@@ -7,10 +7,15 @@ export async function getResponseSchema(url: string, args: any) {
     String(args.path),
     String(args.method),
   );
+
   let response = (op as any)?.responses?.[statusCode];
   if (!response && statusCode === "200")
     response = (op as any)?.responses?.["201"];
-  const schema = response?.content?.["application/json"]?.schema;
+
+  // Try to get schema (handles both v2 and v3)
+  const schema =
+    response?.schema || response?.content?.["application/json"]?.schema;
+
   if (!schema)
     return {
       content: [

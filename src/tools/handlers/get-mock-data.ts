@@ -6,9 +6,10 @@ export async function getMockData(url: string, args: any) {
     String(args.path),
     String(args.method),
   );
-  const resSchema =
-    (op as any)?.responses?.["200"]?.content?.["application/json"]?.schema ||
-    (op as any)?.responses?.["201"]?.content?.["application/json"]?.schema;
+  const res =
+    (op as any)?.responses?.["200"] || (op as any)?.responses?.["201"];
+
+  const resSchema = res?.schema || res?.content?.["application/json"]?.schema;
 
   if (!resSchema)
     return {
