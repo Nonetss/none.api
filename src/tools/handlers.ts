@@ -43,6 +43,8 @@ export async function handleToolCall(name: string, args: any) {
       return handlers.mapDependencies(url, args);
     case "get_framework_snippet":
       return handlers.getFrameworkSnippet(url, args);
+    case "validate_response":
+      return handlers.validateResponse(url, args);
     default:
       throw new Error(`Unknown tool: ${name}`);
   }

@@ -254,4 +254,25 @@ export const TOOLS: Tool[] = [
       required: ["path", "method", "framework"],
     },
   },
+  {
+    name: "validate_response",
+    description:
+      "BACKEND CHECK: Valida un objeto JSON (respuesta del backend) contra el esquema definido en OpenAPI para un endpoint y código de estado específicos. Útil para asegurar que la implementación cumple el contrato.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        path: { type: "string", description: "Ruta del endpoint." },
+        method: { type: "string", description: "Método HTTP." },
+        statusCode: {
+          type: "string",
+          description: "Código de estado esperado (default: '200').",
+        },
+        data: {
+          type: "object",
+          description: "El objeto JSON que se desea validar.",
+        },
+      },
+      required: ["path", "method", "data"],
+    },
+  },
 ];

@@ -14,3 +14,4 @@ export * from "@/tools/handlers/set-security-context.js";
 export * from "@/tools/handlers/find-endpoint.js";
 export * from "@/tools/handlers/map-dependencies.js";
 export * from "@/tools/handlers/get-framework-snippet.js";
+export * from "@/tools/handlers/validate-response.js";
