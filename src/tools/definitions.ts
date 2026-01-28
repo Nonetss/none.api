@@ -13,6 +13,14 @@ export const TOOLS: Tool[] = [
           description:
             "Opcional: URL del JSON/YAML de OpenAPI. Si se omite, usa la API principal.",
         },
+        limit: {
+          type: "number",
+          description: "Límite de resultados a mostrar (default: 50).",
+        },
+        offset: {
+          type: "number",
+          description: "Índice de inicio para la paginación (default: 0).",
+        },
       },
     },
   },
