@@ -4,37 +4,25 @@ export const TOOLS: Tool[] = [
   {
     name: "list_endpoints",
     description:
-      "EXPLORACIÓN INICIAL: Lista todos los endpoints y métodos disponibles en la API configurada. Úsalo como primer paso para conocer las capacidades del sistema.",
+      "PASO 1 (EXPLORACIÓN): Lista todos los endpoints. Úsalo SIEMPRE al inicio para conocer las rutas disponibles antes de desarrollar cualquier funcionalidad.",
     inputSchema: {
       type: "object",
       properties: {
         limit: {
           type: "number",
-          description: "Límite de resultados a mostrar (default: 50).",
+          description: "Límite de resultados (default: 50).",
         },
         offset: {
           type: "number",
-          description: "Índice de inicio para la paginación (default: 0).",
+          description: "Inicio de paginación (default: 0).",
         },
       },
-    },
-  },
-  {
-    name: "search_by_tag",
-    description:
-      "BUSQUEDA POR CATEGORÍA: Lista endpoints agrupados por etiquetas (tags). Útil para encontrar todas las operaciones relacionadas con un recurso específico (ej: 'users', 'orders').",
-    inputSchema: {
-      type: "object",
-      properties: {
-        tag: { type: "string", description: "Nombre del tag para filtrar." },
-      },
-      required: ["tag"],
     },
   },
   {
     name: "get_endpoint_info",
     description:
-      "DETALLES TÉCNICOS: Obtiene la documentación completa de un endpoint específico, incluyendo descripción, parámetros y posibles respuestas. Úsalo antes de intentar realizar una llamada con 'call_endpoint'.",
+      "PASO 2 (ANÁLISIS): Obtiene detalles técnicos de un endpoint. Úsalo para entender los parámetros requeridos y la estructura de respuesta antes de programar.",
     inputSchema: {
       type: "object",
       properties: {
@@ -51,48 +39,9 @@ export const TOOLS: Tool[] = [
     },
   },
   {
-    name: "get_request_schema",
-    description:
-      "ESQUEMA DE PETICIÓN: Obtiene la estructura exacta del JSON requerido para el cuerpo de una petición (body). Esencial para construir objetos válidos en métodos POST, PUT o PATCH.",
-    inputSchema: {
-      type: "object",
-      properties: {
-        path: { type: "string" },
-        method: { type: "string" },
-      },
-      required: ["path", "method"],
-    },
-  },
-  {
-    name: "get_response_schema",
-    description:
-      "ESQUEMA DE RESPUESTA: Muestra la estructura del JSON que devolverá el servidor. Útil para planificar cómo procesar los datos recibidos.",
-    inputSchema: {
-      type: "object",
-      properties: {
-        path: { type: "string" },
-        method: { type: "string" },
-        statusCode: {
-          type: "string",
-          description: "Código HTTP (por defecto '200')",
-        },
-      },
-      required: ["path", "method"],
-    },
-  },
-  {
-    name: "list_tags",
-    description:
-      "ORGANIZACIÓN DE LA API: Lista todas las etiquetas (categorías) definidas en la API. Ayuda a entender la estructura lógica de los recursos.",
-    inputSchema: {
-      type: "object",
-      properties: {},
-    },
-  },
-  {
     name: "get_typescript_types",
     description:
-      "GENERACIÓN DE TIPOS: Crea interfaces TypeScript automáticamente para los objetos de petición y respuesta de un endpoint.",
+      "FRONTEND (TIPADO): Genera interfaces TypeScript para las peticiones y respuestas. Úsalo para asegurar que tu frontend esté perfectamente tipado con el backend.",
     inputSchema: {
       type: "object",
       properties: {
@@ -105,7 +54,7 @@ export const TOOLS: Tool[] = [
   {
     name: "get_zod_schema",
     description:
-      "VALIDACIÓN: Genera un esquema de validación Zod para el cuerpo de la petición o respuesta.",
+      "FRONTEND (VALIDACIÓN): Genera esquemas Zod. Úsalo para implementar validaciones de formularios en el frontend que coincidan con las reglas del backend.",
     inputSchema: {
       type: "object",
       properties: {
@@ -114,33 +63,49 @@ export const TOOLS: Tool[] = [
         target: {
           type: "string",
           enum: ["request", "response"],
-          description: "Objetivo del esquema (default: 'request')",
+          description: "Default: 'request'",
         },
-        statusCode: {
-          type: "string",
-          description: "Código HTTP para la respuesta (default: '200')",
-        },
+        statusCode: { type: "string", description: "Default: '200'" },
       },
       required: ["path", "method"],
     },
   },
   {
-    name: "get_fetch_snippet",
+    name: "get_framework_snippet",
     description:
-      "IMPLEMENTACIÓN RÁPIDA: Genera un fragmento de código JavaScript usando 'fetch' para llamar al endpoint seleccionado.",
+      "FRONTEND (IMPLEMENTACIÓN): Genera hooks de TanStack Query o llamadas Axios. Úsalo para crear la capa de servicios de tu aplicación rápidamente.",
     inputSchema: {
       type: "object",
       properties: {
         path: { type: "string" },
         method: { type: "string" },
+        framework: { type: "string", enum: ["axios", "tanstack-query"] },
       },
-      required: ["path", "method"],
+      required: ["path", "method", "framework"],
+    },
+  },
+  {
+    name: "validate_response",
+    description:
+      "BACKEND (TESTING): Valida si una respuesta JSON cumple con el contrato OpenAPI. ÚSALO SIEMPRE después de escribir código del backend para verificar que tu implementación es correcta.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        path: { type: "string" },
+        method: { type: "string" },
+        statusCode: { type: "string", description: "Default: '200'" },
+        data: {
+          type: "object",
+          description: "Objeto JSON generado por tu código a validar.",
+        },
+      },
+      required: ["path", "method", "data"],
     },
   },
   {
     name: "get_mock_data",
     description:
-      "DATOS DE PRUEBA: Genera un ejemplo de datos ficticios (mock) basados en los esquemas de la API.",
+      "FRONTEND (PROTOTIPADO): Genera datos ficticios que cumplen con el contrato. Úsalo para probar componentes UI antes de que el backend esté listo.",
     inputSchema: {
       type: "object",
       properties: {
@@ -148,75 +113,18 @@ export const TOOLS: Tool[] = [
         method: { type: "string" },
       },
       required: ["path", "method"],
-    },
-  },
-  {
-    name: "get_security_info",
-    description:
-      "AUTENTICACIÓN: Muestra los requisitos de seguridad necesarios para interactuar con la API o un endpoint específico.",
-    inputSchema: {
-      type: "object",
-      properties: {
-        path: { type: "string" },
-        method: { type: "string" },
-      },
-    },
-  },
-  {
-    name: "call_endpoint",
-    description:
-      "EJECUCIÓN REAL: Realiza una petición HTTP real a la API. Debe usarse con precaución.",
-    inputSchema: {
-      type: "object",
-      properties: {
-        path: { type: "string", description: "Ruta del endpoint." },
-        method: { type: "string", description: "Método HTTP." },
-        baseUrl: {
-          type: "string",
-          description:
-            "URL base de ejecución (opcional, usa la de la spec por defecto).",
-        },
-        parameters: {
-          type: "object",
-          description: "Parámetros de ruta y consulta (query).",
-        },
-        body: { type: "object", description: "Cuerpo de la petición (JSON)." },
-        headers: { type: "object", description: "Cabeceras adicionales." },
-      },
-      required: ["path", "method"],
-    },
-  },
-  {
-    name: "set_security_context",
-    description:
-      "CONFIGURACIÓN DE ACCESO: Establece cabeceras de seguridad globales (como 'Authorization').",
-    inputSchema: {
-      type: "object",
-      properties: {
-        headers: {
-          type: "object",
-          description:
-            "Cabeceras de seguridad (ej: {'Authorization': 'Bearer token'})",
-        },
-        scope: {
-          type: "string",
-          description:
-            "Ámbito: nombre de tag, prefijo de ruta o '*' para global (default: '*')",
-        },
-      },
-      required: ["headers"],
     },
   },
   {
     name: "find_endpoint",
     description:
-      "BÚSQUEDA INTELIGENTE: Encuentra endpoints basados en una intención o palabra clave. Ejemplo: 'subir foto', 'borrar usuario'.",
+      "BÚSQUEDA: Encuentra endpoints por palabras clave (ej: 'borrar usuario', 'upload'). Útil si no sabes la ruta exacta pero conoces la intención.",
     inputSchema: {
       type: "object",
       properties: {
         query: {
           type: "string",
-          description: "Término de búsqueda o intención del usuario.",
+          description: "Término de búsqueda o intención.",
         },
       },
       required: ["query"],
@@ -225,54 +133,28 @@ export const TOOLS: Tool[] = [
   {
     name: "map_dependencies",
     description:
-      "ANÁLISIS DE FLUJO: Analiza qué endpoints proporcionan datos (IDs) que otros necesitan.",
+      "ARQUITECTURA: Analiza relaciones entre IDs de diferentes endpoints. Úsalo para entender cómo navegar por la API (ej: qué endpoint te da el ID que necesitas para otro).",
     inputSchema: {
       type: "object",
       properties: {
-        resourceName: {
-          type: "string",
-          description: "Opcional: Filtrar por recurso (ej: 'user').",
-        },
+        resourceName: { type: "string", description: "Ej: 'user', 'album'." },
       },
     },
   },
   {
-    name: "get_framework_snippet",
+    name: "call_endpoint",
     description:
-      "CÓDIGO DE PRODUCCIÓN: Genera implementaciones completas para frameworks modernos (Axios o TanStack Query).",
+      "DEBUG: Realiza una petición real a la API configurada para verificar el comportamiento en vivo.",
     inputSchema: {
       type: "object",
       properties: {
         path: { type: "string" },
         method: { type: "string" },
-        framework: {
-          type: "string",
-          enum: ["axios", "tanstack-query"],
-          description: "Framework objetivo.",
-        },
+        parameters: { type: "object" },
+        body: { type: "object" },
+        headers: { type: "object" },
       },
-      required: ["path", "method", "framework"],
-    },
-  },
-  {
-    name: "validate_response",
-    description:
-      "BACKEND CHECK: Valida un objeto JSON (respuesta del backend) contra el esquema definido en OpenAPI para un endpoint y código de estado específicos. Útil para asegurar que la implementación cumple el contrato.",
-    inputSchema: {
-      type: "object",
-      properties: {
-        path: { type: "string", description: "Ruta del endpoint." },
-        method: { type: "string", description: "Método HTTP." },
-        statusCode: {
-          type: "string",
-          description: "Código de estado esperado (default: '200').",
-        },
-        data: {
-          type: "object",
-          description: "El objeto JSON que se desea validar.",
-        },
-      },
-      required: ["path", "method", "data"],
+      required: ["path", "method"],
     },
   },
 ];
