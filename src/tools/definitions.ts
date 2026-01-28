@@ -4,17 +4,17 @@ export const TOOLS: Tool[] = [
   {
     name: "list_endpoints",
     description:
-      "PASO 1 (EXPLORACIÓN): Lista todos los endpoints. Úsalo SIEMPRE al inicio para conocer las rutas disponibles antes de desarrollar cualquier funcionalidad.",
+      "STEP 1 (EXPLORATION): List all available endpoints. ALWAYS use this first to understand the API capabilities and available routes before developing any feature.",
     inputSchema: {
       type: "object",
       properties: {
         limit: {
           type: "number",
-          description: "Límite de resultados (default: 50).",
+          description: "Limit the number of results (default: 50).",
         },
         offset: {
           type: "number",
-          description: "Inicio de paginación (default: 0).",
+          description: "Starting index for pagination (default: 0).",
         },
       },
     },
@@ -22,17 +22,17 @@ export const TOOLS: Tool[] = [
   {
     name: "get_endpoint_info",
     description:
-      "PASO 2 (ANÁLISIS): Obtiene detalles técnicos de un endpoint. Úsalo para entender los parámetros requeridos y la estructura de respuesta antes de programar.",
+      "STEP 2 (ANALYSIS): Get full technical details of a specific endpoint, including required parameters, headers, and response structure. Use this before writing any code.",
     inputSchema: {
       type: "object",
       properties: {
         path: {
           type: "string",
-          description: "Ruta del endpoint (ej: '/api/v1/users')",
+          description: "The endpoint path (e.g., '/api/v1/users')",
         },
         method: {
           type: "string",
-          description: "Método HTTP (GET, POST, etc.)",
+          description: "HTTP method (GET, POST, etc.)",
         },
       },
       required: ["path", "method"],
@@ -41,7 +41,7 @@ export const TOOLS: Tool[] = [
   {
     name: "get_typescript_types",
     description:
-      "FRONTEND (TIPADO): Genera interfaces TypeScript para las peticiones y respuestas. Úsalo para asegurar que tu frontend esté perfectamente tipado con el backend.",
+      "FRONTEND (TYPING): Generate TypeScript interfaces for request bodies and response data. Essential for maintaining type safety in frontend development.",
     inputSchema: {
       type: "object",
       properties: {
@@ -54,7 +54,7 @@ export const TOOLS: Tool[] = [
   {
     name: "get_zod_schema",
     description:
-      "FRONTEND (VALIDACIÓN): Genera esquemas Zod. Úsalo para implementar validaciones de formularios en el frontend que coincidan con las reglas del backend.",
+      "FRONTEND (VALIDATION): Generate Zod validation schemas for request or response bodies. Perfect for implementing form validation that matches backend rules.",
     inputSchema: {
       type: "object",
       properties: {
@@ -63,9 +63,12 @@ export const TOOLS: Tool[] = [
         target: {
           type: "string",
           enum: ["request", "response"],
-          description: "Default: 'request'",
+          description: "Validation target (default: 'request')",
         },
-        statusCode: { type: "string", description: "Default: '200'" },
+        statusCode: {
+          type: "string",
+          description: "HTTP status code for response validation (default: '200')",
+        },
       },
       required: ["path", "method"],
     },
@@ -73,13 +76,17 @@ export const TOOLS: Tool[] = [
   {
     name: "get_framework_snippet",
     description:
-      "FRONTEND (IMPLEMENTACIÓN): Genera hooks de TanStack Query o llamadas Axios. Úsalo para crear la capa de servicios de tu aplicación rápidamente.",
+      "FRONTEND (IMPLEMENTATION): Generate complete code snippets for modern frameworks like Axios or TanStack Query, including error handling and types.",
     inputSchema: {
       type: "object",
       properties: {
         path: { type: "string" },
         method: { type: "string" },
-        framework: { type: "string", enum: ["axios", "tanstack-query"] },
+        framework: {
+          type: "string",
+          enum: ["axios", "tanstack-query"],
+          description: "Target framework",
+        },
       },
       required: ["path", "method", "framework"],
     },
@@ -87,16 +94,19 @@ export const TOOLS: Tool[] = [
   {
     name: "validate_response",
     description:
-      "BACKEND (TESTING): Valida si una respuesta JSON cumple con el contrato OpenAPI. ÚSALO SIEMPRE después de escribir código del backend para verificar que tu implementación es correcta.",
+      "BACKEND (TESTING): Validate a JSON object against the OpenAPI response schema. ALWAYS use this after writing backend code to verify your implementation matches the contract.",
     inputSchema: {
       type: "object",
       properties: {
         path: { type: "string" },
         method: { type: "string" },
-        statusCode: { type: "string", description: "Default: '200'" },
+        statusCode: {
+          type: "string",
+          description: "Expected HTTP status code (default: '200')",
+        },
         data: {
           type: "object",
-          description: "Objeto JSON generado por tu código a validar.",
+          description: "The JSON response object generated by your code to be validated.",
         },
       },
       required: ["path", "method", "data"],
@@ -105,7 +115,7 @@ export const TOOLS: Tool[] = [
   {
     name: "get_mock_data",
     description:
-      "FRONTEND (PROTOTIPADO): Genera datos ficticios que cumplen con el contrato. Úsalo para probar componentes UI antes de que el backend esté listo.",
+      "FRONTEND (PROTOTYPING): Generate high-fidelity mock data that satisfies the OpenAPI schema. Use this to test UI components before the backend is fully ready.",
     inputSchema: {
       type: "object",
       properties: {
@@ -118,13 +128,13 @@ export const TOOLS: Tool[] = [
   {
     name: "find_endpoint",
     description:
-      "BÚSQUEDA: Encuentra endpoints por palabras clave (ej: 'borrar usuario', 'upload'). Útil si no sabes la ruta exacta pero conoces la intención.",
+      "SEARCH: Find endpoints by intent or keyword (e.g., 'delete user', 'upload file'). Useful when you know what you want to do but not the exact route.",
     inputSchema: {
       type: "object",
       properties: {
         query: {
           type: "string",
-          description: "Término de búsqueda o intención.",
+          description: "Search term or user intent.",
         },
       },
       required: ["query"],
@@ -133,26 +143,32 @@ export const TOOLS: Tool[] = [
   {
     name: "map_dependencies",
     description:
-      "ARQUITECTURA: Analiza relaciones entre IDs de diferentes endpoints. Úsalo para entender cómo navegar por la API (ej: qué endpoint te da el ID que necesitas para otro).",
+      "ARCHITECTURE: Analyze ID relationships between endpoints. Use this to understand the data flow and which endpoint provides the ID required by another.",
     inputSchema: {
       type: "object",
       properties: {
-        resourceName: { type: "string", description: "Ej: 'user', 'album'." },
+        resourceName: {
+          type: "string",
+          description: "Optional: Filter by resource name (e.g., 'user', 'album').",
+        },
       },
     },
   },
   {
     name: "call_endpoint",
     description:
-      "DEBUG: Realiza una petición real a la API configurada para verificar el comportamiento en vivo.",
+      "DEBUG: Execute a real HTTP request to the configured API to verify live behavior and connectivity.",
     inputSchema: {
       type: "object",
       properties: {
         path: { type: "string" },
         method: { type: "string" },
-        parameters: { type: "object" },
-        body: { type: "object" },
-        headers: { type: "object" },
+        parameters: {
+          type: "object",
+          description: "Path and query parameters.",
+        },
+        body: { type: "object", description: "JSON request body." },
+        headers: { type: "object", description: "Additional HTTP headers." },
       },
       required: ["path", "method"],
     },
