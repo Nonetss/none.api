@@ -24,10 +24,13 @@
   "dependencies": {
     "@apidevtools/swagger-parser": "^12.1.0",
     "@modelcontextprotocol/sdk": "0.6.0",
-    "axios": "^1.13.2"
+    "axios": "^1.13.2",
+    "axios-cookiejar-support": "^6.0.5",
+    "tough-cookie": "^6.0.0"
   },
   "devDependencies": {
     "@types/node": "^20.11.24",
+    "@types/tough-cookie": "^4.0.5",
     "typescript": "^5.3.3"
   }
 }

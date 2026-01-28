@@ -1,9 +1,57 @@
 import SwaggerParser from "@apidevtools/swagger-parser";
 import { OpenAPI } from "openapi-types";
-import axios from "axios";
+import axios, { AxiosInstance } from "axios";
+import { wrapper } from "axios-cookiejar-support";
+import { CookieJar } from "tough-cookie";
 
 export class OpenApiService {
   private securityContexts: { scope: string; headers: Record<string, string> }[] = [];
+  private jar: CookieJar;
+  private client: AxiosInstance;
+
+  constructor() {
+    this.jar = new CookieJar();
+    this.client = wrapper(axios.create({ 
+      jar: this.jar, 
+      withCredentials: true 
+    }));
+  }
+
+  public async ensureAuthenticated(specUrl: string) {
+    const email = process.env.AUTH_EMAIL;
+    const password = process.env.AUTH_PASSWORD;
+    const authPath = process.env.AUTH_PATH;
+
+    if (!email || !password || !authPath) return;
+
+    let baseUrl = "";
+    try {
+      const url = new URL(specUrl);
+      baseUrl = `${url.protocol}//${url.host}`;
+    } catch (e) {}
+
+    // Check if we already have cookies for this domain to avoid redundant auth calls
+    const cookies = await this.jar.getCookies(baseUrl || specUrl);
+    if (cookies.length > 0) return;
+
+    try {
+      const authUrl = authPath.startsWith("http") ? authPath : `${baseUrl}${authPath}`;
+      console.error(`[OpenAPI] Attempting authentication to ${authUrl}...`);
+      
+      const response = await this.client.post(authUrl, { email, password }, {
+        headers: { 
+          'Content-Type': 'application/json',
+          'Origin': baseUrl
+        }
+      });
+      
+      console.error(`[OpenAPI] Authentication successful: ${response.status} ${response.statusText}`);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      const details = (error as any).response?.data ? JSON.stringify((error as any).response.data) : "";
+      console.error(`[OpenAPI] Authentication failed: ${message} ${details}`);
+    }
+  }
 
   setSecurityContext(headers: Record<string, string>, scope: string = "*") {
     this.securityContexts = this.securityContexts.filter(s => s.scope !== scope);
@@ -24,8 +72,16 @@ export class OpenApiService {
   }
 
   async getSpec(url: string): Promise<OpenAPI.Document> {
+    await this.ensureAuthenticated(url);
     try {
-      const response = await axios.get(url);
+      let origin = "";
+      try {
+        origin = new URL(url).origin;
+      } catch (e) {}
+
+      const response = await this.client.get(url, {
+        headers: origin ? { 'Origin': origin, 'Referer': origin + "/" } : {}
+      });
       const spec = await SwaggerParser.dereference(response.data);
       return spec as OpenAPI.Document;
     } catch (error) {
@@ -334,6 +390,12 @@ export const use${operationName} = (params: ${reqType}) => {
     if (!baseUrl) {
       if (spec.servers && spec.servers.length > 0) {
         baseUrl = spec.servers[0].url;
+        // Resolve relative baseUrl against specUrl if possible
+        if (baseUrl && !baseUrl.startsWith("http") && specUrl.startsWith("http")) {
+          try {
+            baseUrl = new URL(baseUrl, specUrl).toString();
+          } catch (e) {}
+        }
       } else {
         try {
           const url = new URL(specUrl);
@@ -360,13 +422,18 @@ export const use${operationName} = (params: ${reqType}) => {
 
     const securityHeaders = this.getSecurityHeaders(path, tags);
 
+    await this.ensureAuthenticated(specUrl);
+
     try {
-      const response = await axios({
+      const origin = (baseUrl && baseUrl.startsWith("http")) ? new URL(baseUrl).origin : undefined;
+      
+      const response = await this.client({
         method: method.toLowerCase(),
         url: fullUrl.toString(),
         data: options.body,
         headers: {
           'Content-Type': 'application/json',
+          ...(origin ? { 'Origin': origin, 'Referer': origin + "/" } : {}),
           ...securityHeaders,
           ...options.headers
         },

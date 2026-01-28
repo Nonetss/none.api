@@ -2,9 +2,14 @@
   "mcpServers": {
     "none.api": {
       "command": "node",
-      "args": ["/absolute/path/to/openapi/build/index.js"],
+      "args": [
+        "/path/to/your/project/build/index.js"
+      ],
       "env": {
-        "OPENAPI_URL": "http://localhost:3000/doc"
+        "OPENAPI_URL": "http://localhost:3000/api/v0/openapi.json",
+        "AUTH_EMAIL": "admin@example.com",
+        "AUTH_PASSWORD": "your-password",
+        "AUTH_PATH": "/api/auth/sign-in/email"
       }
     }
   }
