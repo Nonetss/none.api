@@ -1,11 +1,7 @@
 import { openApiService } from "@/services/openapi.service.js";
 
 export async function getRequestSchema(url: string, args: any) {
-  const op = await openApiService.getEndpointInfo(
-    url,
-    String(args.path),
-    String(args.method),
-  );
+  const op = await openApiService.getEndpointInfo(url, String(args.path), String(args.method));
 
   // OpenAPI v3 style
   let schema = (op as any)?.requestBody?.content?.["application/json"]?.schema;

@@ -13,8 +13,7 @@ export async function getZodSchema(url: string, args: any) {
     schema = (op as any)?.requestBody?.content?.["application/json"]?.schema;
   } else {
     let response = (op as any)?.responses?.[statusCode];
-    if (!response && statusCode === "200")
-      response = (op as any)?.responses?.["201"];
+    if (!response && statusCode === "200") response = (op as any)?.responses?.["201"];
     schema = response?.content?.["application/json"]?.schema;
   }
 

@@ -7,9 +7,7 @@ export function getHumanName(op: any, method: string, path: string): string {
   const resource = parts.length > 0 ? parts[parts.length - 1] : "resource";
   const action = method.toLowerCase();
 
-  const name = `${action}_${resource}`.replace(/_([a-z])/g, (g) =>
-    g[1].toUpperCase(),
-  );
+  const name = `${action}_${resource}`.replace(/_([a-z])/g, (g) => g[1].toUpperCase());
   return name;
 }
 
@@ -17,7 +15,7 @@ export function getFrameworkSnippet(
   path: string,
   method: string,
   framework: "axios" | "tanstack-query",
-  op: any,
+  op: any
 ): string {
   const humanName = getHumanName(op, method, path);
   const operationName = humanName.charAt(0).toUpperCase() + humanName.slice(1);
@@ -29,12 +27,8 @@ export function getFrameworkSnippet(
     op.responses?.["200"]?.content?.["application/json"]?.schema ||
     op.responses?.["201"]?.content?.["application/json"]?.schema;
 
-  if (reqSchema)
-    types +=
-      jsonSchemaToTypeScript(reqSchema, `${operationName}Request`) + "\n";
-  if (resSchema)
-    types +=
-      jsonSchemaToTypeScript(resSchema, `${operationName}Response`) + "\n";
+  if (reqSchema) types += jsonSchemaToTypeScript(reqSchema, `${operationName}Request`) + "\n";
+  if (resSchema) types += jsonSchemaToTypeScript(resSchema, `${operationName}Response`) + "\n";
 
   const reqType = reqSchema ? `${operationName}Request` : "any";
   const resType = resSchema ? `${operationName}Response` : "any";

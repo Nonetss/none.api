@@ -5,9 +5,7 @@ export function jsonSchemaToTypeScript(schema: any, name: string): string {
     const indent = "  ".repeat(level);
     if (s.$ref) return s.$ref.split("/").pop();
     if (s.oneOf || s.anyOf) {
-      return (s.oneOf || s.anyOf)
-        .map((option: any) => parseSchema(option, level))
-        .join(" | ");
+      return (s.oneOf || s.anyOf).map((option: any) => parseSchema(option, level)).join(" | ");
     }
 
     switch (s.type) {
@@ -23,9 +21,7 @@ export function jsonSchemaToTypeScript(schema: any, name: string): string {
       case "array":
         return `${parseSchema(s.items || {}, level)}[]`;
       case "string":
-        return s.enum
-          ? s.enum.map((e: string) => `'${e}'`).join(" | ")
-          : "string";
+        return s.enum ? s.enum.map((e: string) => `'${e}'`).join(" | ") : "string";
       case "number":
       case "integer":
         return "number";
@@ -43,8 +39,7 @@ export function jsonSchemaToZod(schema: any): string {
   if (!schema) return "z.any()";
 
   const parse = (s: any): string => {
-    if (s.$ref)
-      return `// Reference to ${s.$ref.split("/").pop()} - please check defined schemas`;
+    if (s.$ref) return `// Reference to ${s.$ref.split("/").pop()} - please check defined schemas`;
 
     switch (s.type) {
       case "object":
@@ -60,8 +55,7 @@ export function jsonSchemaToZod(schema: any): string {
         return `z.array(${parse(s.items || {})})`;
       case "string":
         let str = "z.string()";
-        if (s.enum)
-          str = `z.enum([${s.enum.map((e: string) => `'${e}'`).join(", ")}])`;
+        if (s.enum) str = `z.enum([${s.enum.map((e: string) => `'${e}'`).join(", ")}])`;
         if (s.pattern) str += `.regex(/${s.pattern}/)`;
         if (s.minLength !== undefined) str += `.min(${s.minLength})`;
         if (s.maxLength !== undefined) str += `.max(${s.maxLength})`;
@@ -93,9 +87,7 @@ export function generateMockData(schema: any, name: string = ""): any {
   switch (schema.type) {
     case "object":
       const obj: any = {};
-      for (const [prop, propSchema] of Object.entries(
-        schema.properties || {},
-      )) {
+      for (const [prop, propSchema] of Object.entries(schema.properties || {})) {
         obj[prop] = generateMockData(propSchema, prop);
       }
       return obj;
@@ -105,13 +97,8 @@ export function generateMockData(schema: any, name: string = ""): any {
         .fill(0)
         .map(() => generateMockData(schema.items || {}, name));
     case "string":
-      if (schema.enum)
-        return schema.enum[Math.floor(Math.random() * schema.enum.length)];
-      if (
-        lowerName.includes("avatar") ||
-        lowerName.includes("image") ||
-        lowerName.includes("img")
-      )
+      if (schema.enum) return schema.enum[Math.floor(Math.random() * schema.enum.length)];
+      if (lowerName.includes("avatar") || lowerName.includes("image") || lowerName.includes("img"))
         return `https://picsum.photos/seed/${Math.random()}/200/300`;
       if (lowerName.includes("email")) return "dev.architect@example.com";
       if (lowerName.includes("name")) return "Jane Architect Doe";
@@ -122,8 +109,7 @@ export function generateMockData(schema: any, name: string = ""): any {
       )
         return "This is a high-fidelity semantic description generated to test layout constraints and text wrapping in a professional environment.";
       if (schema.format === "date-time") return new Date().toISOString();
-      if (lowerName.includes("url") || schema.format === "uri")
-        return "https://example.com/api";
+      if (lowerName.includes("url") || schema.format === "uri") return "https://example.com/api";
       return "Standard String";
 
     case "number":

@@ -6,8 +6,7 @@ export async function getTypeScriptTypes(url: string, args: any) {
   const op = await openApiService.getEndpointInfo(url, path, method);
 
   let ts = "";
-  const reqSchema = (op as any)?.requestBody?.content?.["application/json"]
-    ?.schema;
+  const reqSchema = (op as any)?.requestBody?.content?.["application/json"]?.schema;
   if (reqSchema) {
     ts += openApiService.jsonSchemaToTypeScript(reqSchema, "Request") + "\n\n";
   }
@@ -20,8 +19,6 @@ export async function getTypeScriptTypes(url: string, args: any) {
   }
 
   return {
-    content: [
-      { type: "text", text: ts || "No JSON schemas found for this endpoint." },
-    ],
+    content: [{ type: "text", text: ts || "No JSON schemas found for this endpoint." }],
   };
 }

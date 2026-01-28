@@ -21,7 +21,7 @@ export class OpenApiService {
       axios.create({
         jar: this.jar,
         withCredentials: true,
-      }),
+      })
     );
   }
 
@@ -42,9 +42,7 @@ export class OpenApiService {
     if (cookies.length > 0) return;
 
     try {
-      const authUrl = authPath.startsWith("http")
-        ? authPath
-        : `${baseUrl}${authPath}`;
+      const authUrl = authPath.startsWith("http") ? authPath : `${baseUrl}${authPath}`;
       console.error(`[OpenAPI] Attempting authentication to ${authUrl}...`);
 
       const response = await this.client.post(
@@ -55,11 +53,11 @@ export class OpenApiService {
             "Content-Type": "application/json",
             Origin: baseUrl,
           },
-        },
+        }
       );
 
       console.error(
-        `[OpenAPI] Authentication successful: ${response.status} ${response.statusText}`,
+        `[OpenAPI] Authentication successful: ${response.status} ${response.statusText}`
       );
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
@@ -71,16 +69,11 @@ export class OpenApiService {
   }
 
   setSecurityContext(headers: Record<string, string>, scope: string = "*") {
-    this.securityContexts = this.securityContexts.filter(
-      (s) => s.scope !== scope,
-    );
+    this.securityContexts = this.securityContexts.filter((s) => s.scope !== scope);
     this.securityContexts.push({ scope, headers });
   }
 
-  getSecurityHeaders(
-    path: string,
-    tags: string[] = [],
-  ): Record<string, string> {
+  getSecurityHeaders(path: string, tags: string[] = []): Record<string, string> {
     let headers = {};
     const global = this.securityContexts.find((s) => s.scope === "*");
     if (global) headers = { ...global.headers };
@@ -112,7 +105,7 @@ export class OpenApiService {
         return spec as OpenAPI.Document;
       } catch (innerError) {
         throw new Error(
-          `Failed to parse OpenAPI spec from ${url}: ${error instanceof Error ? error.message : String(error)}`,
+          `Failed to parse OpenAPI spec from ${url}: ${error instanceof Error ? error.message : String(error)}`
         );
       }
     }
@@ -156,7 +149,7 @@ export class OpenApiService {
     path: string,
     method: string,
     framework: "axios" | "tanstack-query",
-    op: any,
+    op: any
   ): string {
     return frameworkUtils.getFrameworkSnippet(path, method, framework, op);
   }
@@ -180,7 +173,7 @@ export class OpenApiService {
       parameters?: Record<string, any>;
       body?: any;
       headers?: Record<string, any>;
-    },
+    }
   ) {
     const spec = (await this.getSpec(specUrl)) as any;
     const op = spec.paths?.[path]?.[method.toLowerCase()] || {};
@@ -191,11 +184,7 @@ export class OpenApiService {
     if (!baseUrl) {
       if (spec.servers && spec.servers.length > 0) {
         baseUrl = spec.servers[0].url;
-        if (
-          baseUrl &&
-          !baseUrl.startsWith("http") &&
-          specUrl.startsWith("http")
-        ) {
+        if (baseUrl && !baseUrl.startsWith("http") && specUrl.startsWith("http")) {
           try {
             baseUrl = new URL(baseUrl, specUrl).toString();
           } catch (e) {}
@@ -205,9 +194,7 @@ export class OpenApiService {
           const url = new URL(specUrl);
           baseUrl = `${url.protocol}//${url.host}`;
         } catch (e) {
-          throw new Error(
-            "Could not infer Base URL. Please provide 'baseUrl'.",
-          );
+          throw new Error("Could not infer Base URL. Please provide 'baseUrl'.");
         }
       }
     }
@@ -231,10 +218,7 @@ export class OpenApiService {
     await this.ensureAuthenticated(specUrl);
 
     try {
-      const origin =
-        baseUrl && baseUrl.startsWith("http")
-          ? new URL(baseUrl).origin
-          : undefined;
+      const origin = baseUrl && baseUrl.startsWith("http") ? new URL(baseUrl).origin : undefined;
 
       const response = await this.client({
         method: method.toLowerCase(),

@@ -13,9 +13,7 @@ async function main() {
   if (defaultUrl) {
     console.error(`Default OpenAPI URL configured: ${defaultUrl}`);
   } else {
-    console.error(
-      "No default OpenAPI URL configured. Clients must provide the 'url' argument.",
-    );
+    console.error("No default OpenAPI URL configured. Clients must provide the 'url' argument.");
   }
 }
 

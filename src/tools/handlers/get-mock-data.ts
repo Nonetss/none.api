@@ -1,13 +1,8 @@
 import { openApiService } from "@/services/openapi.service.js";
 
 export async function getMockData(url: string, args: any) {
-  const op = await openApiService.getEndpointInfo(
-    url,
-    String(args.path),
-    String(args.method),
-  );
-  const res =
-    (op as any)?.responses?.["200"] || (op as any)?.responses?.["201"];
+  const op = await openApiService.getEndpointInfo(url, String(args.path), String(args.method));
+  const res = (op as any)?.responses?.["200"] || (op as any)?.responses?.["201"];
 
   const resSchema = res?.schema || res?.content?.["application/json"]?.schema;
 

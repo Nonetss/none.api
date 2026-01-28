@@ -5,7 +5,7 @@ export async function listTags(url: string, args: any) {
   const text = tags
     .map(
       (t: { name: string; description?: string }) =>
-        `${t.name}${t.description ? `: ${t.description}` : ""}`,
+        `${t.name}${t.description ? `: ${t.description}` : ""}`
     )
     .join("\n");
   return { content: [{ type: "text", text }] };

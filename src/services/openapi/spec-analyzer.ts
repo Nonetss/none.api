@@ -7,9 +7,7 @@ export interface EndpointInfo {
   fullPath?: string;
 }
 
-export async function getEndpoints(
-  spec: OpenAPI.Document,
-): Promise<EndpointInfo[]> {
+export async function getEndpoints(spec: OpenAPI.Document): Promise<EndpointInfo[]> {
   const endpoints: EndpointInfo[] = [];
   const v3Spec = spec as OpenAPIV3.Document;
   const v2Spec = spec as OpenAPIV2.Document;
@@ -50,7 +48,7 @@ export async function getEndpoints(
 
 export async function findEndpoints(
   spec: OpenAPI.Document,
-  query: string,
+  query: string
 ): Promise<EndpointInfo[]> {
   const endpoints = await getEndpoints(spec);
   const synonyms: Record<string, string[]> = {
@@ -68,10 +66,7 @@ export async function findEndpoints(
     .toLowerCase()
     .split(/\s+/)
     .filter((w) => w.length > 0);
-  const expandedWords = originalWords.flatMap((word) => [
-    word,
-    ...(synonyms[word] || []),
-  ]);
+  const expandedWords = originalWords.flatMap((word) => [word, ...(synonyms[word] || [])]);
 
   return endpoints.filter((e) => {
     const searchText = `${e.method} ${e.path} ${e.summary}`.toLowerCase();
@@ -84,7 +79,7 @@ export async function findEndpoints(
 }
 
 export async function getTags(
-  spec: OpenAPI.Document,
+  spec: OpenAPI.Document
 ): Promise<{ name: string; description: string }[]> {
   const v3Spec = spec as OpenAPIV3.Document;
   if (v3Spec.tags && v3Spec.tags.length > 0) {
@@ -115,7 +110,7 @@ export interface DependencyMap {
 export async function mapDependencies(
   spec: OpenAPI.Document,
 
-  resourceName?: string,
+  resourceName?: string
 ): Promise<DependencyMap> {
   const providers: DependencyMap["providers"] = [];
 
@@ -135,24 +130,18 @@ export async function mapDependencies(
 
       const responses = operation.responses || {};
 
-      const successRes = (responses["200"] ||
-        responses["201"]) as OpenAPIV3.ResponseObject;
+      const successRes = (responses["200"] || responses["201"]) as OpenAPIV3.ResponseObject;
 
-      const resSchema = successRes?.content?.["application/json"]
-        ?.schema as OpenAPIV3.SchemaObject;
+      const resSchema = successRes?.content?.["application/json"]?.schema as OpenAPIV3.SchemaObject;
 
       if (resSchema) {
-        const props =
-          resSchema.properties || (resSchema as any).items?.properties;
+        const props = resSchema.properties || (resSchema as any).items?.properties;
 
         if (props) {
           for (const prop of Object.keys(props)) {
             // Buscamos campos que terminen en Id o sean 'id'
 
-            if (
-              prop.toLowerCase() === "id" ||
-              prop.toLowerCase().endsWith("id")
-            ) {
+            if (prop.toLowerCase() === "id" || prop.toLowerCase().endsWith("id")) {
               // Intentamos deducir el tipo de recurso (ej: de 'GET /albums' sacamos 'album')
 
               const resource =
@@ -172,21 +161,15 @@ export async function mapDependencies(
 
       // 2. Encontrar qué IDs consume (en parámetros)
 
-      const parameters = (operation.parameters ||
-        []) as OpenAPIV3.ParameterObject[];
+      const parameters = (operation.parameters || []) as OpenAPIV3.ParameterObject[];
 
       for (const p of parameters) {
-        if (
-          p.name &&
-          (p.name.toLowerCase() === "id" || p.name.toLowerCase().endsWith("id"))
-        ) {
+        if (p.name && (p.name.toLowerCase() === "id" || p.name.toLowerCase().endsWith("id"))) {
           const resource =
             p.name.toLowerCase() === "id"
               ? path
                   .split("/")
-                  .filter(
-                    (p) => p && !p.startsWith("{") && p !== "api" && p !== "v0",
-                  )
+                  .filter((p) => p && !p.startsWith("{") && p !== "api" && p !== "v0")
                   .pop()
                   ?.replace(/s$/, "") || "resource"
               : p.name.replace(/id$/i, "");
@@ -199,9 +182,7 @@ export async function mapDependencies(
 
   if (resourceName) {
     const filter = (item: any) =>
-      (item.provides || item.consumes)
-        ?.toLowerCase()
-        .includes(resourceName.toLowerCase());
+      (item.provides || item.consumes)?.toLowerCase().includes(resourceName.toLowerCase());
     return {
       providers: providers.filter(filter),
       consumers: consumers.filter(filter),
@@ -211,19 +192,14 @@ export async function mapDependencies(
   return { providers, consumers };
 }
 
-export async function getSecurityDetails(
-  spec: OpenAPI.Document,
-  path?: string,
-  method?: string,
-) {
+export async function getSecurityDetails(spec: OpenAPI.Document, path?: string, method?: string) {
   const v3Spec = spec as OpenAPIV3.Document;
   const globalSecurity = v3Spec.security || [];
   const securitySchemes = v3Spec.components?.securitySchemes || {};
 
   let endpointSecurity = null;
   if (path && method) {
-    endpointSecurity = (v3Spec.paths?.[path] as any)?.[method.toLowerCase()]
-      ?.security;
+    endpointSecurity = (v3Spec.paths?.[path] as any)?.[method.toLowerCase()]?.security;
   }
 
   return {

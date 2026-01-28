@@ -6,7 +6,7 @@ export async function handleToolCall(name: string, args: any) {
 
   if (!url && name !== "set_security_context") {
     throw new Error(
-      "OPENAPI_URL environment variable is not set in the MCP configuration. This server is locked to its environment configuration.",
+      "OPENAPI_URL environment variable is not set in the MCP configuration. This server is locked to its environment configuration."
     );
   }
 

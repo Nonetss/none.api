@@ -23,9 +23,7 @@ export async function listEndpoints(url: string, args: any) {
 
   for (const [tag, items] of Object.entries(grouped)) {
     text += `### CATEGORY: ${tag.toUpperCase()}\n`;
-    text += items
-      .map((e) => `- ${e.method} ${e.fullPath || e.path} (${e.summary})`)
-      .join("\n");
+    text += items.map((e) => `- ${e.method} ${e.fullPath || e.path} (${e.summary})`).join("\n");
     text += "\n\n";
   }
 

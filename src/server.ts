@@ -20,7 +20,7 @@ export function createServer() {
         tools: {},
         resources: {},
       },
-    },
+    }
   );
 
   server.setRequestHandler(ListResourcesRequestSchema, async () => {
@@ -32,8 +32,7 @@ export function createServer() {
               uri: "openapi://spec",
               name: "Current OpenAPI Specification",
               mimeType: "application/json",
-              description:
-                "The full de-referenced OpenAPI specification currently in use.",
+              description: "The full de-referenced OpenAPI specification currently in use.",
             },
           ]
         : [],
@@ -64,10 +63,7 @@ export function createServer() {
 
   server.setRequestHandler(CallToolRequestSchema, async (request) => {
     try {
-      return await handleToolCall(
-        request.params.name,
-        request.params.arguments,
-      );
+      return await handleToolCall(request.params.name, request.params.arguments);
     } catch (error) {
       return {
         content: [
