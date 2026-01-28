@@ -1,6 +1,6 @@
 {
   "mcpServers": {
-    "openapi-explorer": {
+    "none.api": {
       "command": "node",
       "args": ["/absolute/path/to/openapi/build/index.js"],
       "env": {

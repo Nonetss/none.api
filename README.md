@@ -1,4 +1,4 @@
-# OpenAPI Explorer MCP Server
+# none.api - OpenAPI Explorer MCP Server
 
 Professional OpenAPI explorer for the Model Context Protocol (MCP), optimized for **Frontend Development** and **Backend Contract Verification**.
 
