@@ -3,8 +3,8 @@ import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
-import { TOOLS } from "./tools/definitions.js";
-import { handleToolCall } from "./tools/handlers.js";
+import { TOOLS } from "@/tools/definitions.js";
+import { handleToolCall } from "@/tools/handlers.js";
 
 export function createServer() {
   const server = new Server(

@@ -1,24 +1,19 @@
 {
-  "name": "@nonetss/none.api",
+  "name": "openapi-explorer-mcp",
   "version": "1.0.5",
   "description": "Professional OpenAPI Explorer MCP server",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Nonetss/none.api.git"
-  },
-  "private": false,
+  "private": true,
   "type": "module",
   "bin": {
-    "none-api": "build/index.js"
+    "openapi-explorer": "build/index.js"
   },
   "files": [
     "build"
   ],
   "scripts": {
-    "build": "tsc && node -e \"require('fs').chmodSync('build/index.js', '755')\"",
+    "build": "tsc && tsc-alias && node -e \"require('fs').chmodSync('build/index.js', '755')\"",
     "prepare": "npm run build",
-    "prepublishOnly": "npm run build",
-    "watch": "tsc --watch",
+    "watch": "tsc --watch & tsc-alias --watch",
     "inspector": "npx @modelcontextprotocol/inspector build/index.js"
   },
   "dependencies": {
@@ -31,6 +26,7 @@
   "devDependencies": {
     "@types/node": "^20.11.24",
     "@types/tough-cookie": "^4.0.5",
+    "tsc-alias": "^1.8.8",
     "typescript": "^5.3.3"
   }
 }
