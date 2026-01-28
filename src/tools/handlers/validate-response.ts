@@ -14,11 +14,9 @@ export async function validateResponse(url: string, args: any) {
 
   const op = await openApiService.getEndpointInfo(url, path, method);
   let response = (op as any)?.responses?.[statusCode];
-  if (!response && statusCode === "200")
-    response = (op as any)?.responses?.["201"];
+  if (!response && statusCode === "200") response = (op as any)?.responses?.["201"];
 
-  const schema =
-    response?.schema || response?.content?.["application/json"]?.schema;
+  const schema = response?.schema || response?.content?.["application/json"]?.schema;
 
   if (!schema) {
     return {
@@ -46,10 +44,7 @@ export async function validateResponse(url: string, args: any) {
     };
   } else {
     const errors = validate.errors
-      ?.map(
-        (err: any) =>
-          `- ${err.instancePath} ${err.message} (${JSON.stringify(err.params)})`,
-      )
+      ?.map((err: any) => `- ${err.instancePath} ${err.message} (${JSON.stringify(err.params)})`)
       .join("\n");
     return {
       content: [
