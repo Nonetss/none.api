@@ -11,6 +11,19 @@ It is specifically designed to:
 1.  **Accelerate Frontend Development**: Generate types, Zod schemas, mock data, and data-fetching hooks (Axios/TanStack Query) directly from the API definition.
 2.  **Verify Backend Implementation**: Validate backend response objects against the OpenAPI contract to ensure the implementation matches the specification.
 
+### Installation
+
+#### Using npx (Recommended)
+You can run the server directly without installation:
+```bash
+npx @nonetss/none.api
+```
+
+#### Global Installation
+```bash
+npm install -g @nonetss/none.api
+```
+
 ### Key Features
 
 - **Smart Exploration**: Categorized endpoint listing and keyword-based search (with multilingual synonym support).
@@ -46,9 +59,9 @@ Add this to your `claude_desktop_config.json` or Cursor MCP settings:
 ```json
 {
   "mcpServers": {
-    "openapi-explorer": {
-      "command": "node",
-      "args": ["/absolute/path/to/openapi/build/index.js"],
+    "none.api": {
+      "command": "npx",
+      "args": ["-y", "@nonetss/none.api"],
       "env": {
         "OPENAPI_URL": "http://localhost:3000/doc",
         "AUTH_EMAIL": "admin@example.com",
