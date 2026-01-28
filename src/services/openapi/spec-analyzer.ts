@@ -53,15 +53,33 @@ export async function findEndpoints(
   query: string,
 ): Promise<EndpointInfo[]> {
   const endpoints = await getEndpoints(spec);
-  const words = query
+  const synonyms: Record<string, string[]> = {
+    borrar: ["delete", "remove", "destroy", "eliminate"],
+    eliminar: ["delete", "remove", "destroy"],
+    crear: ["post", "create", "add", "new"],
+    buscar: ["get", "search", "find", "list", "query"],
+    obtener: ["get", "find", "read"],
+    actualizar: ["put", "patch", "update", "modify", "edit"],
+    lista: ["list", "get", "all"],
+    subir: ["upload", "post", "import"],
+  };
+
+  const originalWords = query
     .toLowerCase()
     .split(/\s+/)
     .filter((w) => w.length > 0);
+  const expandedWords = originalWords.flatMap((word) => [
+    word,
+    ...(synonyms[word] || []),
+  ]);
 
   return endpoints.filter((e) => {
     const searchText = `${e.method} ${e.path} ${e.summary}`.toLowerCase();
-    // Debe contener todas las palabras de la búsqueda
-    return words.every((word) => searchText.includes(word));
+    // Basta con que las palabras originales o sus sinónimos estén presentes
+    return originalWords.every((original) => {
+      const options = [original, ...(synonyms[original] || [])];
+      return options.some((opt) => searchText.includes(opt));
+    });
   });
 }
 
@@ -96,21 +114,30 @@ export interface DependencyMap {
 
 export async function mapDependencies(
   spec: OpenAPI.Document,
+
   resourceName?: string,
 ): Promise<DependencyMap> {
   const providers: DependencyMap["providers"] = [];
+
   const consumers: DependencyMap["consumers"] = [];
+
   const paths = spec.paths || {};
 
   for (const [path, pathItem] of Object.entries(paths)) {
     if (!pathItem) continue;
+
     for (const [method, op] of Object.entries(pathItem)) {
       const operation = op as OpenAPIV3.OperationObject;
-      if (!operation) continue;
+
+      if (!operation || typeof operation !== "object") continue;
+
+      // 1. Encontrar qué IDs proporciona este endpoint (en la respuesta)
 
       const responses = operation.responses || {};
+
       const successRes = (responses["200"] ||
         responses["201"]) as OpenAPIV3.ResponseObject;
+
       const resSchema = successRes?.content?.["application/json"]
         ?.schema as OpenAPIV3.SchemaObject;
 
@@ -120,18 +147,51 @@ export async function mapDependencies(
 
         if (props) {
           for (const prop of Object.keys(props)) {
-            if (prop.toLowerCase().endsWith("id")) {
-              providers.push({ path, method, provides: prop });
+            // Buscamos campos que terminen en Id o sean 'id'
+
+            if (
+              prop.toLowerCase() === "id" ||
+              prop.toLowerCase().endsWith("id")
+            ) {
+              // Intentamos deducir el tipo de recurso (ej: de 'GET /albums' sacamos 'album')
+
+              const resource =
+                prop.toLowerCase() === "id"
+                  ? path
+                      .split("/")
+                      .filter((p) => p && p !== "api" && p !== "v0")
+                      .pop()
+                      ?.replace(/s$/, "") || "resource"
+                  : prop.replace(/id$/i, "");
+
+              providers.push({ path, method, provides: resource });
             }
           }
         }
       }
 
+      // 2. Encontrar qué IDs consume (en parámetros)
+
       const parameters = (operation.parameters ||
         []) as OpenAPIV3.ParameterObject[];
+
       for (const p of parameters) {
-        if (p.name && p.name.toLowerCase().endsWith("id")) {
-          consumers.push({ path, method, consumes: p.name, in: p.in });
+        if (
+          p.name &&
+          (p.name.toLowerCase() === "id" || p.name.toLowerCase().endsWith("id"))
+        ) {
+          const resource =
+            p.name.toLowerCase() === "id"
+              ? path
+                  .split("/")
+                  .filter(
+                    (p) => p && !p.startsWith("{") && p !== "api" && p !== "v0",
+                  )
+                  .pop()
+                  ?.replace(/s$/, "") || "resource"
+              : p.name.replace(/id$/i, "");
+
+          consumers.push({ path, method, consumes: resource, in: p.in });
         }
       }
     }
